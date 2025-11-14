@@ -4,6 +4,7 @@ import type { BiasDefinition } from '../types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/Card';
 import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
+import { BiasSimulation } from '../components/modules/BiasSimulation';
 import { AlertCircle, Shield, TrendingUp, TrendingDown, Shuffle } from 'lucide-react';
 
 export function BiasLab() {
@@ -180,22 +181,13 @@ export function BiasLab() {
         )}
       </div>
 
-      {/* Interactive Simulation Placeholder */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Interactive Simulation (Coming Soon)</CardTitle>
-          <CardDescription>
-            Visualize how {selectedBias?.name.toLowerCase()} affects study results
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="h-64 border rounded-md bg-muted flex items-center justify-center">
-            <p className="text-muted-foreground">
-              Interactive visualization will be displayed here
-            </p>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Interactive Simulation */}
+      {selectedBias && (
+        <div>
+          <h2 className="text-2xl font-bold mb-4">Interactive Bias Simulation</h2>
+          <BiasSimulation bias={selectedBias} />
+        </div>
+      )}
     </div>
   );
 }
