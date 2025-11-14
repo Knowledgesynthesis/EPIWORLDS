@@ -1,0 +1,31 @@
+import { StrictMode, useEffect } from 'react';
+import { createRoot } from 'react-dom/client';
+import { useThemeStore } from './stores/useThemeStore';
+import App from './App.tsx';
+import './index.css';
+
+function Root() {
+  const theme = useThemeStore((state) => state.theme);
+
+  useEffect(() => {
+    const root = window.document.documentElement;
+    root.classList.remove('light', 'dark');
+
+    if (theme === 'system') {
+      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches
+        ? 'dark'
+        : 'light';
+      root.classList.add(systemTheme);
+    } else {
+      root.classList.add(theme);
+    }
+  }, [theme]);
+
+  return <App />;
+}
+
+createRoot(document.getElementById('root')!).render(
+  <StrictMode>
+    <Root />
+  </StrictMode>
+);
