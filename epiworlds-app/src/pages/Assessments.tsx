@@ -1,48 +1,51 @@
+import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';
-import { GraduationCap, Clock, CheckCircle } from 'lucide-react';
-
-const assessments = [
-  {
-    id: 'study-design-basics',
-    title: 'Study Design Fundamentals',
-    description: 'Test your understanding of different epidemiologic study designs',
-    questions: 15,
-    timeLimit: 20,
-    difficulty: 'beginner',
-    topics: ['RCTs', 'Cohort Studies', 'Case-Control', 'Cross-Sectional'],
-  },
-  {
-    id: 'bias-identification',
-    title: 'Bias Identification',
-    description: 'Identify types of bias in research scenarios',
-    questions: 20,
-    timeLimit: 25,
-    difficulty: 'intermediate',
-    topics: ['Selection Bias', 'Information Bias', 'Confounding'],
-  },
-  {
-    id: 'dag-interpretation',
-    title: 'DAG Interpretation',
-    description: 'Analyze causal diagrams and identify adjustment strategies',
-    questions: 12,
-    timeLimit: 30,
-    difficulty: 'advanced',
-    topics: ['Confounders', 'Colliders', 'Mediators', 'Backdoor Paths'],
-  },
-  {
-    id: 'effect-modification',
-    title: 'Confounding vs Effect Modification',
-    description: 'Distinguish between confounding and effect modification',
-    questions: 10,
-    timeLimit: 15,
-    difficulty: 'intermediate',
-    topics: ['Stratification', 'Interaction', 'Adjustment'],
-  },
-];
+import { GraduationCap, Clock, CheckCircle, ArrowLeft } from 'lucide-react';
+import { assessments } from '../data/assessmentQuestions';
+import { QuizComponent } from '../components/modules/QuizComponent';
+import { useProgressStore } from '../stores/useProgressStore';
+import type { Assessment } from '../types';
 
 export function Assessments() {
+  const [selectedAssessment, setSelectedAssessment] = useState<Assessment | null>(null);
+  const { assessmentScores, setAssessmentScore } = useProgressStore();
+
+  const handleStartAssessment = (assessment: Assessment) => {
+    setSelectedAssessment(assessment);
+  };
+
+  const handleBackToList = () => {
+    setSelectedAssessment(null);
+  };
+
+  const handleQuizComplete = (score: number) => {
+    if (selectedAssessment) {
+      setAssessmentScore(selectedAssessment.id, score);
+    }
+  };
+
+  if (selectedAssessment) {
+    return (
+      <div className="space-y-6">
+        <Button variant="ghost" onClick={handleBackToList}>
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Back to Assessments
+        </Button>
+        <div>
+          <h1 className="text-3xl font-bold">{selectedAssessment.title}</h1>
+          <p className="text-muted-foreground mt-2">
+            {selectedAssessment.description}
+          </p>
+        </div>
+        <QuizComponent
+          assessment={selectedAssessment}
+          onComplete={handleQuizComplete}
+        />
+      </div>
+    );
+  }
   return (
     <div className="space-y-6">
       <div>
@@ -55,53 +58,69 @@ export function Assessments() {
 
       {/* Assessment Cards */}
       <div className="grid gap-6 md:grid-cols-2">
-        {assessments.map((assessment) => (
-          <Card key={assessment.id} className="flex flex-col">
-            <CardHeader>
-              <div className="flex items-start justify-between">
-                <GraduationCap className="h-8 w-8 text-primary" />
-                <Badge
-                  variant={
-                    assessment.difficulty === 'beginner'
-                      ? 'default'
-                      : assessment.difficulty === 'intermediate'
-                      ? 'secondary'
-                      : 'outline'
-                  }
-                >
-                  {assessment.difficulty}
-                </Badge>
-              </div>
-              <CardTitle className="text-xl mt-4">{assessment.title}</CardTitle>
-              <CardDescription>{assessment.description}</CardDescription>
-            </CardHeader>
-            <CardContent className="flex-1 space-y-4">
-              <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                <span className="flex items-center gap-1">
-                  <CheckCircle className="h-4 w-4" />
-                  {assessment.questions} questions
-                </span>
-                <span className="flex items-center gap-1">
-                  <Clock className="h-4 w-4" />
-                  {assessment.timeLimit} min
-                </span>
-              </div>
+        {assessments.map((assessment) => {
+          const previousScore = assessmentScores[assessment.id];
+          const categories = new Set(assessment.questions.map((q) => q.category));
 
-              <div>
-                <p className="text-sm font-medium mb-2">Topics covered:</p>
-                <div className="flex flex-wrap gap-2">
-                  {assessment.topics.map((topic) => (
-                    <Badge key={topic} variant="outline">
-                      {topic}
+          return (
+            <Card key={assessment.id} className="flex flex-col">
+              <CardHeader>
+                <div className="flex items-start justify-between">
+                  <GraduationCap className="h-8 w-8 text-primary" />
+                  <div className="flex flex-col items-end gap-2">
+                    <Badge variant="outline">
+                      {assessment.questions.find((q) => q.difficulty)?.difficulty ||
+                        'intermediate'}
                     </Badge>
-                  ))}
+                    {previousScore !== undefined && (
+                      <Badge
+                        variant={
+                          previousScore >= assessment.passingScore
+                            ? 'default'
+                            : 'secondary'
+                        }
+                      >
+                        Best: {previousScore.toFixed(0)}%
+                      </Badge>
+                    )}
+                  </div>
                 </div>
-              </div>
+                <CardTitle className="text-xl mt-4">{assessment.title}</CardTitle>
+                <CardDescription>{assessment.description}</CardDescription>
+              </CardHeader>
+              <CardContent className="flex-1 space-y-4">
+                <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                  <span className="flex items-center gap-1">
+                    <CheckCircle className="h-4 w-4" />
+                    {assessment.questions.length} questions
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <Clock className="h-4 w-4" />
+                    {assessment.timeLimit} min
+                  </span>
+                </div>
 
-              <Button className="w-full mt-auto">Start Assessment</Button>
-            </CardContent>
-          </Card>
-        ))}
+                <div>
+                  <p className="text-sm font-medium mb-2">Topics covered:</p>
+                  <div className="flex flex-wrap gap-2">
+                    {Array.from(categories).map((topic) => (
+                      <Badge key={topic} variant="outline">
+                        {topic}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+
+                <Button
+                  className="w-full mt-auto"
+                  onClick={() => handleStartAssessment(assessment)}
+                >
+                  {previousScore !== undefined ? 'Retry Assessment' : 'Start Assessment'}
+                </Button>
+              </CardContent>
+            </Card>
+          );
+        })}
       </div>
 
       {/* Instructions */}
