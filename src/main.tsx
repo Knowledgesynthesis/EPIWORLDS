@@ -1,31 +1,24 @@
-import { StrictMode, useEffect } from 'react';
+import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import { useThemeStore } from './stores/useThemeStore';
-import App from './App.tsx';
+import App from './App';
+import { applyTheme, useThemeStore } from './stores/useThemeStore';
 import './index.css';
 
-function Root() {
-  const theme = useThemeStore((state) => state.theme);
+// Keep <html class> in sync with the chosen theme and, for "system", with the OS.
+applyTheme(useThemeStore.getState().theme);
+useThemeStore.subscribe((s) => applyTheme(s.theme));
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+  if (useThemeStore.getState().theme === 'system') applyTheme('system');
+});
 
-  useEffect(() => {
-    const root = window.document.documentElement;
-    root.classList.remove('light', 'dark');
-
-    if (theme === 'system') {
-      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches
-        ? 'dark'
-        : 'light';
-      root.classList.add(systemTheme);
-    } else {
-      root.classList.add(theme);
-    }
-  }, [theme]);
-
-  return <App />;
+if ('serviceWorker' in navigator && import.meta.env.PROD) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(() => undefined);
+  });
 }
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <Root />
+    <App />
   </StrictMode>
 );

@@ -1,147 +1,71 @@
-import { useState, useMemo } from 'react';
-import { glossaryTerms } from '../data/glossary';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card';
-import { Badge } from '../components/ui/Badge';
+import { useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Search } from 'lucide-react';
+import { PageHeader } from '../components/PageHeader';
+import { moduleById, modules } from '../data/curriculum';
+import { glossary } from '../data/glossary';
+import { cn } from '../lib/utils';
 
-export function Glossary() {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<string>('All');
+const slug = (t: string) => t.toLowerCase().replace(/[^a-z0-9]+/g, '-');
 
-  const categories = useMemo(() => {
-    const cats = Array.from(new Set(glossaryTerms.map((term) => term.category)));
-    return ['All', ...cats.sort()];
-  }, []);
-
-  const filteredTerms = useMemo(() => {
-    return glossaryTerms.filter((term) => {
-      const matchesSearch =
-        term.term.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        term.definition.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        term.synonyms?.some((syn) =>
-          syn.toLowerCase().includes(searchTerm.toLowerCase())
-        );
-
-      const matchesCategory =
-        selectedCategory === 'All' || term.category === selectedCategory;
-
-      return matchesSearch && matchesCategory;
-    });
-  }, [searchTerm, selectedCategory]);
+export default function Glossary() {
+  const [q, setQ] = useState('');
+  const [mod, setMod] = useState<string>('all');
+  const sorted = useMemo(() => [...glossary].sort((a, b) => a.term.localeCompare(b.term)), []);
+  const terms = useMemo(() => {
+    const needle = q.trim().toLowerCase();
+    return sorted.filter(
+      (t) =>
+        (mod === 'all' || t.module === mod) &&
+        (!needle || t.term.toLowerCase().includes(needle) || t.definition.toLowerCase().includes(needle) || t.aka?.some((a) => a.toLowerCase().includes(needle)))
+    );
+  }, [q, mod, sorted]);
+  const known = new Set(glossary.map((t) => t.term));
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">Epidemiology Glossary</h1>
-        <p className="text-muted-foreground mt-2">
-          Comprehensive definitions of key terms in clinical epidemiology and
-          causal inference.
-        </p>
+    <div>
+      <PageHeader eyebrow={`${glossary.length} terms`} title="Glossary">
+        Precise definitions, with formulas where they help and links to the module that teaches each term.
+      </PageHeader>
+      <div className="sticky top-14 z-10 -mx-4 mb-6 space-y-3 border-b bg-background/95 px-4 py-3 backdrop-blur lg:top-0">
+        <div className="relative">
+          <Search className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-muted-foreground" aria-hidden />
+          <label htmlFor="gloss-search" className="sr-only">Search glossary</label>
+          <input id="gloss-search" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search terms, synonyms, definitions…" className="h-10 w-full rounded-md border border-input bg-card pl-9 pr-3 text-sm" />
+        </div>
+        <div className="flex gap-1.5 overflow-x-auto pb-1" role="group" aria-label="Filter by module">
+          <button type="button" onClick={() => setMod('all')} className={cn('shrink-0 rounded-full border px-3 py-1 text-xs', mod === 'all' ? 'border-primary bg-accent font-medium' : 'hover:bg-accent/50')}>All</button>
+          {modules.map((m) => (
+            <button key={m.id} type="button" onClick={() => setMod(m.id)} className={cn('shrink-0 rounded-full border px-3 py-1 text-xs', mod === m.id ? 'border-primary bg-accent font-medium' : 'hover:bg-accent/50')}>
+              {m.n}. {m.title.split(' ').slice(0, 3).join(' ')}
+            </button>
+          ))}
+        </div>
       </div>
-
-      {/* Search and Filters */}
-      <Card>
-        <CardContent className="pt-6">
-          <div className="space-y-4">
-            {/* Search Bar */}
-            <div className="relative">
-              <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-              <input
-                type="text"
-                placeholder="Search terms, definitions, or synonyms..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border rounded-md bg-background"
-              />
-            </div>
-
-            {/* Category Filter */}
-            <div className="flex flex-wrap gap-2">
-              {categories.map((category) => (
-                <Badge
-                  key={category}
-                  variant={selectedCategory === category ? 'default' : 'outline'}
-                  className="cursor-pointer"
-                  onClick={() => setSelectedCategory(category)}
-                >
-                  {category}
-                </Badge>
-              ))}
-            </div>
+      <p className="mb-4 text-sm text-muted-foreground" role="status">{terms.length} of {glossary.length} terms</p>
+      <dl className="space-y-3">
+        {terms.map((t) => (
+          <div key={t.term} id={slug(t.term)} className="scroll-mt-40 rounded-lg border bg-card p-4">
+            <dt className="flex flex-wrap items-baseline gap-x-2">
+              <span className="text-base font-semibold">{t.term}</span>
+              {t.aka && <span className="text-xs text-muted-foreground">also: {t.aka.join(', ')}</span>}
+            </dt>
+            <dd className="mt-1.5 space-y-2 text-sm leading-6">
+              <p>{t.definition}</p>
+              {t.formula && <p className="formula inline-block max-w-full overflow-x-auto whitespace-pre-wrap text-xs sm:text-sm">{t.formula}</p>}
+              {t.example && <p className="text-muted-foreground">Example: {t.example}</p>}
+              <p className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">
+                <Link to={`/learn/${t.module}`} className="font-medium text-primary underline underline-offset-2">Module {moduleById[t.module].n}</Link>
+                {t.related?.filter((r) => known.has(r)).map((r) => (
+                  <button key={r} type="button" onClick={() => { setQ(r); setMod('all'); }} className="text-muted-foreground underline underline-offset-2 hover:text-foreground">
+                    {r}
+                  </button>
+                ))}
+              </p>
+            </dd>
           </div>
-        </CardContent>
-      </Card>
-
-      {/* Results Count */}
-      <div className="text-sm text-muted-foreground">
-        Showing {filteredTerms.length} of {glossaryTerms.length} terms
-      </div>
-
-      {/* Glossary Terms */}
-      <div className="space-y-4">
-        {filteredTerms.map((term) => (
-          <Card key={term.id}>
-            <CardHeader>
-              <div className="flex items-start justify-between">
-                <div className="space-y-1">
-                  <CardTitle className="text-xl">{term.term}</CardTitle>
-                  <div className="flex flex-wrap gap-2">
-                    <Badge variant="secondary">{term.category}</Badge>
-                    {term.synonyms && term.synonyms.length > 0 && (
-                      <Badge variant="outline">
-                        Also: {term.synonyms.join(', ')}
-                      </Badge>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <p className="text-base">{term.definition}</p>
-
-              {term.examples && term.examples.length > 0 && (
-                <div>
-                  <h4 className="font-semibold mb-2">Examples:</h4>
-                  <ul className="space-y-1">
-                    {term.examples.map((example, index) => (
-                      <li key={index} className="flex items-start gap-2 text-sm">
-                        <span className="text-muted-foreground mt-0.5">•</span>
-                        <span>{example}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-
-              {term.relatedTerms && term.relatedTerms.length > 0 && (
-                <div>
-                  <h4 className="font-semibold mb-2">Related Terms:</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {term.relatedTerms.map((related, index) => (
-                      <Badge
-                        key={index}
-                        variant="outline"
-                        className="cursor-pointer hover:bg-accent"
-                        onClick={() => setSearchTerm(related)}
-                      >
-                        {related}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </CardContent>
-          </Card>
         ))}
-
-        {filteredTerms.length === 0 && (
-          <Card>
-            <CardContent className="py-8 text-center text-muted-foreground">
-              No terms found matching your search criteria.
-            </CardContent>
-          </Card>
-        )}
-      </div>
+      </dl>
     </div>
   );
 }

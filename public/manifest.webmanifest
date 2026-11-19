@@ -1,0 +1,11 @@
+{
+  "name": "EpiWorlds — Epidemiology from study design to causal inference",
+  "short_name": "EpiWorlds",
+  "description": "Interactive, evidence-based clinical epidemiology and causal inference.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f9f9f7",
+  "theme_color": "#0f766e",
+  "icons": [{ "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+}
