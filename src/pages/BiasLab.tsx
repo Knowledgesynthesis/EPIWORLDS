@@ -1,191 +1,84 @@
-import { useState } from 'react';
-import { biasTypes } from '../data/biasTypes';
-import type { BiasDefinition } from '../types';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/Card';
-import { Badge } from '../components/ui/Badge';
-import { Button } from '../components/ui/Button';
-import { BiasSimulation } from '../components/modules/BiasSimulation';
-import { AlertCircle, Shield, TrendingUp, TrendingDown, Shuffle } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { PageHeader } from '../components/PageHeader';
+import { Tabs } from '../components/TabbedPage';
+import { useTab } from '../lib/useTab';
+import { Misclassification } from '../components/interactives/Misclassification';
+import { SelectionSim } from '../components/interactives/SelectionSim';
+import { ImmortalTime, LeadTime } from '../components/interactives/TimeBiases';
+import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card';
 
-export function BiasLab() {
-  const [selectedBias, setSelectedBias] = useState<BiasDefinition | null>(
-    biasTypes[0]
-  );
+const tabs = ['selection', 'misclassification', 'time', 'map'] as const;
 
-  const getDirectionIcon = (direction: string) => {
-    switch (direction) {
-      case 'towards-null':
-        return <TrendingDown className="h-4 w-4" />;
-      case 'away-from-null':
-        return <TrendingUp className="h-4 w-4" />;
-      default:
-        return <Shuffle className="h-4 w-4" />;
-    }
-  };
+const biasMap: { structure: string; mechanism: string; named: string; module: string }[] = [
+  { structure: 'Confounding', mechanism: 'Open backdoor path (common cause of exposure and outcome)', named: 'Confounding by indication, healthy-user effect, channelling, residual confounding', module: 'confounding' },
+  { structure: 'Selection bias', mechanism: 'Conditioning on a common effect (collider) of exposure and outcome or their causes', named: "Berkson's bias, differential loss to follow-up, non-response, healthy worker effect, survivor bias", module: 'selection-bias' },
+  { structure: 'Measurement bias', mechanism: 'Error in measuring exposure, outcome or confounders', named: 'Recall, interviewer, detection, misclassification, regression dilution', module: 'information-bias' },
+  { structure: 'Time-related', mechanism: 'Misaligned time zero or exposure defined after follow-up starts', named: 'Immortal time, prevalent-user, protopathic, lead-time, length-time', module: 'clinical-biases' },
+  { structure: 'Reporting', mechanism: 'What is published depends on the results', named: 'Publication bias, outcome switching, selective analysis reporting', module: 'appraisal' },
+];
 
-  const getDirectionColor = (direction: string) => {
-    switch (direction) {
-      case 'towards-null':
-        return 'text-blue-500';
-      case 'away-from-null':
-        return 'text-red-500';
-      default:
-        return 'text-yellow-500';
-    }
-  };
-
+export default function BiasLab() {
+  const [tab, setTab] = useTab(tabs, 'selection');
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">Bias Visualization Lab</h1>
-        <p className="text-muted-foreground mt-2">
-          Explore different types of bias and understand how they affect study
-          results.
-        </p>
-      </div>
-
-      <div className="grid gap-6 lg:grid-cols-3">
-        {/* Bias Type List */}
-        <div className="lg:col-span-1">
+    <div>
+      <PageHeader eyebrow="Lab" title="Bias Lab">
+        Every bias here is computed, not asserted: set the mechanism and the lab shows the true and observed estimates side by side.
+      </PageHeader>
+      <Tabs
+        label="Bias type"
+        tab={tab}
+        setTab={setTab}
+        options={[
+          { value: 'selection', label: 'Selection' },
+          { value: 'misclassification', label: 'Misclassification' },
+          { value: 'time', label: 'Time-related' },
+          { value: 'map', label: 'Bias map' },
+        ]}
+      />
+      {tab === 'selection' && <SelectionSim />}
+      {tab === 'misclassification' && <Misclassification />}
+      {tab === 'time' && (
+        <div className="space-y-8">
           <Card>
-            <CardHeader>
-              <CardTitle>Bias Types</CardTitle>
-              <CardDescription>Select a bias to explore</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                {biasTypes.map((bias) => (
-                  <Button
-                    key={bias.id}
-                    variant={selectedBias?.id === bias.id ? 'default' : 'outline'}
-                    className="w-full justify-start"
-                    onClick={() => setSelectedBias(bias)}
-                  >
-                    {bias.name}
-                  </Button>
-                ))}
-              </div>
-            </CardContent>
+            <CardHeader><CardTitle>Immortal time bias</CardTitle></CardHeader>
+            <CardContent><ImmortalTime /></CardContent>
+          </Card>
+          <Card>
+            <CardHeader><CardTitle>Lead-time bias in screening</CardTitle></CardHeader>
+            <CardContent><LeadTime /></CardContent>
           </Card>
         </div>
-
-        {/* Bias Details */}
-        {selectedBias && (
-          <div className="lg:col-span-2 space-y-6">
-            {/* Overview */}
-            <Card>
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div className="space-y-2 flex-1">
-                    <CardTitle className="text-2xl">
-                      {selectedBias.name}
-                    </CardTitle>
-                    <div className="flex flex-wrap gap-2">
-                      <Badge variant="secondary">
-                        {selectedBias.type.replace('-', ' ').toUpperCase()}
-                      </Badge>
-                      <Badge
-                        variant="outline"
-                        className={getDirectionColor(selectedBias.direction)}
-                      >
-                        <span className="flex items-center gap-1">
-                          {getDirectionIcon(selectedBias.direction)}
-                          {selectedBias.direction.replace('-', ' ')}
-                        </span>
-                      </Badge>
-                    </div>
-                  </div>
-                  <AlertCircle className="h-8 w-8 text-destructive" />
-                </div>
-                <CardDescription className="text-base mt-4">
-                  {selectedBias.description}
-                </CardDescription>
-              </CardHeader>
-            </Card>
-
-            {/* Direction Explanation */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  {getDirectionIcon(selectedBias.direction)}
-                  Bias Direction
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  {selectedBias.direction === 'towards-null' && (
-                    <p>
-                      This bias typically pushes effect estimates{' '}
-                      <strong>towards the null</strong> (making associations
-                      appear weaker than they truly are). This can lead to false
-                      negative findings.
-                    </p>
-                  )}
-                  {selectedBias.direction === 'away-from-null' && (
-                    <p>
-                      This bias typically pushes effect estimates{' '}
-                      <strong>away from the null</strong> (making associations
-                      appear stronger than they truly are). This can lead to false
-                      positive findings.
-                    </p>
-                  )}
-                  {selectedBias.direction === 'unpredictable' && (
-                    <p>
-                      The direction of this bias is <strong>unpredictable</strong>{' '}
-                      and depends on the specific study context. It can push
-                      estimates towards or away from the null, making it
-                      particularly challenging to identify and correct.
-                    </p>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Examples */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Real-World Examples</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-3">
-                  {selectedBias.examples.map((example, index) => (
-                    <li key={index} className="flex items-start gap-2">
-                      <span className="text-destructive mt-0.5">•</span>
-                      <span>{example}</span>
-                    </li>
-                  ))}
-                </ul>
-              </CardContent>
-            </Card>
-
-            {/* Prevention Strategies */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Shield className="h-5 w-5 text-green-500" />
-                  Prevention Strategies
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-3">
-                  {selectedBias.prevention.map((strategy, index) => (
-                    <li key={index} className="flex items-start gap-2">
-                      <span className="text-green-500 mt-0.5">✓</span>
-                      <span>{strategy}</span>
-                    </li>
-                  ))}
-                </ul>
-              </CardContent>
-            </Card>
+      )}
+      {tab === 'map' && (
+        <div className="space-y-4">
+          <p className="text-sm leading-6 text-muted-foreground">
+            Dozens of named biases reduce to a few structures (Hernán & Robins). Identify the structure and you know the fix.
+          </p>
+          <div className="overflow-x-auto rounded-lg border">
+            <table className="w-full min-w-[40rem] text-sm">
+              <thead className="bg-muted/50">
+                <tr>
+                  <th className="px-3 py-2 text-left font-semibold">Structure</th>
+                  <th className="px-3 py-2 text-left font-semibold">Mechanism</th>
+                  <th className="px-3 py-2 text-left font-semibold">Named biases</th>
+                </tr>
+              </thead>
+              <tbody>
+                {biasMap.map((b) => (
+                  <tr key={b.structure} className="border-t align-top">
+                    <td className="px-3 py-2 font-medium">
+                      <Link to={`/learn/${b.module}`} className="text-primary underline underline-offset-2">{b.structure}</Link>
+                    </td>
+                    <td className="px-3 py-2">{b.mechanism}</td>
+                    <td className="px-3 py-2 text-muted-foreground">{b.named}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
-        )}
-      </div>
-
-      {/* Interactive Simulation */}
-      {selectedBias && (
-        <div>
-          <h2 className="text-2xl font-bold mb-4">Interactive Bias Simulation</h2>
-          <BiasSimulation bias={selectedBias} />
+          <p className="text-sm text-muted-foreground">
+            Random error is not on this map: it shrinks with sample size, bias does not. See the <Link to="/study-sandbox" className="underline underline-offset-2">Study Simulator</Link>.
+          </p>
         </div>
       )}
     </div>

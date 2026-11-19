@@ -1,79 +1,43 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-interface ProgressStore {
-  completedModules: Set<string>;
-  assessmentScores: Record<string, number>;
-  currentModule: string | null;
-  totalTimeSpent: number;
+export interface Attempt {
+  /** Whether the most recent attempt was correct. */
+  correct: boolean;
+  attempts: number;
+  everCorrect: boolean;
+  at: number;
+}
 
-  completeModule: (moduleId: string) => void;
-  setAssessmentScore: (assessmentId: string, score: number) => void;
-  setCurrentModule: (moduleId: string | null) => void;
-  addTimeSpent: (minutes: number) => void;
-  resetProgress: () => void;
-  isModuleCompleted: (moduleId: string) => boolean;
+interface ProgressStore {
+  answers: Record<string, Attempt>;
+  completed: string[];
+  record: (questionId: string, correct: boolean) => void;
+  setComplete: (moduleId: string, done: boolean) => void;
+  reset: () => void;
 }
 
 export const useProgressStore = create<ProgressStore>()(
   persist(
-    (set, get) => ({
-      completedModules: new Set<string>(),
-      assessmentScores: {},
-      currentModule: null,
-      totalTimeSpent: 0,
-
-      completeModule: (moduleId) => {
-        set((state) => ({
-          completedModules: new Set(state.completedModules).add(moduleId),
-        }));
-      },
-
-      setAssessmentScore: (assessmentId, score) => {
-        set((state) => ({
-          assessmentScores: {
-            ...state.assessmentScores,
-            [assessmentId]: score,
-          },
-        }));
-      },
-
-      setCurrentModule: (moduleId) => {
-        set({ currentModule: moduleId });
-      },
-
-      addTimeSpent: (minutes) => {
-        set((state) => ({
-          totalTimeSpent: state.totalTimeSpent + minutes,
-        }));
-      },
-
-      resetProgress: () => {
-        set({
-          completedModules: new Set<string>(),
-          assessmentScores: {},
-          currentModule: null,
-          totalTimeSpent: 0,
-        });
-      },
-
-      isModuleCompleted: (moduleId) => {
-        return get().completedModules.has(moduleId);
-      },
+    (set) => ({
+      answers: {},
+      completed: [],
+      record: (id, correct) =>
+        set((s) => {
+          const prev = s.answers[id];
+          return {
+            answers: {
+              ...s.answers,
+              [id]: { correct, attempts: (prev?.attempts ?? 0) + 1, everCorrect: correct || !!prev?.everCorrect, at: Date.now() },
+            },
+          };
+        }),
+      setComplete: (moduleId, done) =>
+        set((s) => ({
+          completed: done ? [...new Set([...s.completed, moduleId])] : s.completed.filter((m) => m !== moduleId),
+        })),
+      reset: () => set({ answers: {}, completed: [] }),
     }),
-    {
-      name: 'progress-storage',
-      partialize: (state) => ({
-        completedModules: Array.from(state.completedModules),
-        assessmentScores: state.assessmentScores,
-        currentModule: state.currentModule,
-        totalTimeSpent: state.totalTimeSpent,
-      }),
-      merge: (persistedState: any, currentState) => ({
-        ...currentState,
-        ...persistedState,
-        completedModules: new Set(persistedState?.completedModules || []),
-      }),
-    }
+    { name: 'epiworlds-progress', version: 1 }
   )
 );

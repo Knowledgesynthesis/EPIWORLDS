@@ -1,151 +1,77 @@
-# EpiWorlds - From Study Design to Causation
+# EpiWorlds — from study design to causation
 
-**A comprehensive, interactive learning environment for mastering clinical epidemiology** — built for clinicians, researchers, and public health professionals.
+An interactive course in clinical epidemiology and causal inference. Eleven sequenced modules, five labs and a 78-question bank take a learner from a 2×2 table to target trial emulation, with every number computed by a tested library and every claim linked to its source.
 
-![React](https://img.shields.io/badge/React-19.2-blue) ![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue) ![Tailwind](https://img.shields.io/badge/TailwindCSS-4.1-blue) ![Vite](https://img.shields.io/badge/Vite-7.2-purple)
+**Live:** https://epiworlds.vercel.app
 
----
+## What's inside
 
-## 🎯 Vision
+| # | Module | You will be able to | Interactive |
+|---|--------|---------------------|-------------|
+| 1 | Measuring disease and association | Compute and interpret risk, rate, odds, RR, RD, OR, NNT with CIs | 2×2 calculator, OR-vs-RR explorer |
+| 2 | Study designs | Match designs to questions; know what each estimates | Design chooser |
+| 3 | Random error, precision and power | Read CIs and P values correctly; plan sample size | 100-study simulator, power calculator |
+| 4 | Causal inference and DAGs | Apply d-separation and the backdoor criterion | DAG workbench |
+| 5 | Confounding | Diagnose by stratification; choose a control method | Confounding simulator (Simpson's paradox) |
+| 6 | Selection bias | Recognise collider stratification; quantify it | Berkson's bias, loss-to-follow-up simulator |
+| 7 | Information bias | Predict and correct misclassification | Se/Sp misclassification simulator |
+| 8 | Effect modification and interaction | Assess heterogeneity on both scales; judge subgroup claims | RERI explorer |
+| 9 | Time-related and clinical biases | Spot immortal time, confounding by indication, screening biases | Immortal-time and lead-time demos |
+| 10 | From association to causation | Appraise causal claims; use E-values and current tools | E-value calculator |
+| 11 | Research ethics and integrity | Evaluate proposals against current standards | Ethics case clinic |
 
-EpiWorlds transforms how clinicians learn epidemiology. Instead of passive reading, learners actively build studies, visualize bias, construct causal diagrams, and explore complex concepts through interactive sandboxes.
+Each module has learning objectives, a concise lesson, embedded interactives, checkpoint questions with rationales, takeaways, pitfalls and DOI-linked sources. Progress and mastery are stored locally in the browser.
 
----
+**Labs:** DAG Lab · Confounding & Effect-Modification Lab · Bias Lab · Study Simulator · Calculators.
+**Reference:** study-design catalogue, ethics clinic, 82-term glossary, formula sheet and full bibliography.
 
-## ✨ Features
+## Evidence base
 
-### 📚 **Study Design Explorer**
-- Comprehensive overview of RCTs, cohort studies, case-control studies, cross-sectional, and ecologic designs
-- Side-by-side comparisons of strengths, limitations, and real-world examples
-- Interactive study design selector
+- Methods follow *Modern Epidemiology* (4th ed., 2021) and Hernán & Robins, *Causal Inference: What If*; structural definitions of confounding, selection and measurement bias.
+- Standards current to late 2026: CONSORT 2025, SPIRIT 2025, TARGET 2025, STROBE (+ STROBE-Equity 2025), PRISMA 2020, STARD 2015 (+ STARD-AI 2025), TRIPOD+AI 2024, RoB 2, ROBINS-I V2 (2024), GRADE guidance 18, Declaration of Helsinki (Oct 2024), ICH E6(R3) (2025), Common Rule 2018 Requirements.
+- All 74 references are listed in `src/data/references.ts`; every DOI was verified against Crossref metadata.
 
-### 🔬 **Bias Visualization Lab**
-- Explore 8+ types of bias (selection, information, confounding, recall, observer, etc.)
-- Understand bias direction (towards null, away from null, unpredictable)
-- Prevention strategies for each bias type
+## Correctness
 
-### 🔀 **Causal DAG Builder**
-- Build directed acyclic graphs from scratch
-- Add nodes (variables) and edges (causal relationships)
-- Real-time SVG visualization with cycle detection
+Calculations live in `src/lib` and are unit-tested against published worked examples:
 
-### 🎓 **Assessment Hub**
-- Multiple choice and scenario-based questions
-- Difficulty levels: Beginner, Intermediate, Advanced
-- Topics: Study designs, bias identification, DAG interpretation, confounding
+- `epi.ts` — Katz RR, Woolf OR, Newcombe hybrid-score RD (reproduces Newcombe 1998), Altman NNT intervals, Mantel–Haenszel RR/OR with Greenland–Robins and Robins–Breslow–Greenland variances, homogeneity test, RERI, E-values (reproduces VanderWeele & Ding 2017), Fleiss sample size (10% vs 20% → 199/group), misclassification and selection-bias formulas.
+- `dag.ts` — path enumeration, d-separation including descendants of colliders, backdoor criterion, minimal sufficient adjustment sets (tested on confounding, mediation, collider, M-bias and butterfly-bias structures).
+- `sim.ts` — seeded simulations (CI coverage ≈ 95% without bias, → 0% with confounding as n grows; immortal-time bias).
+- `stats.ts` — normal/chi-square distributions, Wilson interval, seeded PRNG.
 
-### 📖 **Comprehensive Glossary**
-- 20+ epidemiologic terms with definitions
-- Searchable by term, definition, or synonym
-- Filterable by category
+`scripts/e2e.mjs` renders all 31 routes on desktop and phone in light and dark mode, fails on console errors or horizontal overflow, exercises the DAG Lab, calculators, checkpoints, exam mode, glossary and mobile menu, and verifies the app works offline.
 
-### ⚖️ **Research Ethics Module**
-- Core ethical principles: Equipoise, Informed Consent, Beneficence, Justice
-- IRB review levels
-- Reporting standards (CONSORT, STROBE, PRISMA)
+## Development
 
----
-
-## 🚀 Getting Started
-
-### **Prerequisites**
-- Node.js 18+ and npm
-
-### **Installation**
+Requires Node 20+.
 
 ```bash
-# Install dependencies
 npm install
-
-# Start development server
-npm run dev
-
-# Build for production
-npm run build
-
-# Preview production build
-npm run preview
+npm run dev        # http://localhost:5173
+npm test           # unit tests (Vitest)
+npm run lint
+npm run build      # type-check + production build to dist/
+npm run test:e2e   # after build; needs Playwright with Chromium
 ```
 
-The app will be available at `http://localhost:5173`
+Stack: React 19, TypeScript 5.9, Vite 7, Tailwind CSS 3.4, Zustand 5, React Router 7, Lucide icons. Charts are hand-built SVG (no chart library). Routes are code-split; a generated service worker precaches the build so the app works offline after one visit.
 
----
+```
+src/
+  lib/            statistics, epidemiology, DAG and simulation code (+ __tests__)
+  data/           curriculum, questions, glossary, references, designs, DAG presets, ethics cases
+  content/lessons one component per module
+  components/     interactives, charts (viz), layout, UI primitives
+  pages/          routes
+  stores/         theme, progress and DAG workspace (persisted)
+docs/             the original product brief and design principles
+```
 
-## 🏗️ Technical Architecture
+To add a question, append to `src/data/questions.ts` (MCQ or numeric with tolerance; it appears in the module checkpoint and in Practice automatically). To cite a source, add it to `src/data/references.ts` with its DOI.
 
-### **Tech Stack**
-- **Framework**: React 19.2 with TypeScript 5.9
-- **Build Tool**: Vite 7.2
-- **Styling**: Tailwind CSS 4.1
-- **State Management**: Zustand with persistence
-- **Routing**: React Router DOM
-- **Icons**: Lucide React
+## Deployment
 
-### **Key Features**
-- **Dark Mode**: System-aware with manual toggle
-- **Mobile-First**: Responsive design optimized for all devices
-- **Type-Safe**: Full TypeScript coverage
-- **Performance**: Code splitting with React Router
+Vercel builds `npm run build` and serves `dist/`. `vercel.json` rewrites all paths to `index.html` so deep links work, marks hashed assets immutable, and serves `sw.js` uncached so updates propagate.
 
----
-
-## 📚 Learning Modules
-
-1. **Study Design Explorer** - Learn about different epidemiologic study designs
-2. **Bias Visualization Lab** - Understand how bias affects study results
-3. **Causal DAG Builder** - Build and analyze directed acyclic graphs
-4. **Confounding & Effect Modification Lab** - Practice distinguishing confounding from effect modification
-5. **Assessment Hub** - Test your knowledge with quizzes
-6. **Glossary** - Quick reference for key epidemiologic terms
-7. **Research Ethics** - Understand ethical principles governing clinical research
-
----
-
-## 🗺️ Roadmap
-
-### **Phase 1: Foundation** ✅
-- [x] Project setup with Vite + React + TypeScript
-- [x] Core UI components and navigation
-- [x] Dark mode support
-- [x] State management
-
-### **Phase 2: Core Modules** ✅
-- [x] Study Design Explorer
-- [x] Bias Visualization Lab
-- [x] DAG Builder with SVG rendering
-- [x] Glossary with search
-- [x] Assessment Hub structure
-- [x] Ethics module
-
-### **Phase 3: Interactivity** (Planned)
-- [ ] Interactive bias simulations
-- [ ] Confounding lab with stratification calculator
-- [ ] Study sandbox with parameter manipulation
-- [ ] Complete assessment questions with feedback
-
-### **Phase 4: Advanced Features** (Planned)
-- [ ] Offline support with Service Worker
-- [ ] Synthetic dataset generator
-- [ ] Advanced DAG analysis
-- [ ] User progress tracking
-- [ ] Data visualization with Recharts
-
----
-
-## 📖 Educational Standards
-
-EpiWorlds is aligned with:
-- **STROBE** - Strengthening the Reporting of Observational Studies in Epidemiology
-- **CONSORT** - Consolidated Standards of Reporting Trials
-- **EQUATOR Network** guidelines
-- Modern causal inference frameworks (Hernán & Robins)
-
----
-
-## 📝 License
-
-This project is licensed under the MIT License.
-
----
-
-**Built with ❤️ for clinicians, by educators committed to excellent epidemiology training.**
+All datasets are synthetic. MIT License.

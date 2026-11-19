@@ -1,230 +1,124 @@
 import { Link } from 'react-router-dom';
-import {
-  BookOpen,
-  Microscope,
-  Network,
-  FlaskConical,
-  GraduationCap,
-  BookMarked,
-  Scale,
-  ArrowRight,
-} from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/Card';
-import { Button } from '../components/ui/Button';
-import { Badge } from '../components/ui/Badge';
+import { ArrowRight, Calculator, CheckCircle2, FlaskConical, GraduationCap, Microscope, Network, Sigma } from 'lucide-react';
+import { PageHeader } from '../components/PageHeader';
+import { buttonClasses } from '../components/ui/buttonClasses';
+import { modules } from '../data/curriculum';
+import { questions } from '../data/questions';
+import { useMastery } from '../lib/progress';
+import { cn } from '../lib/utils';
+import { useProgressStore } from '../stores/useProgressStore';
 
-const modules = [
-  {
-    id: 'study-designs',
-    title: 'Study Design Explorer',
-    description:
-      'Learn about RCTs, cohort studies, case-control studies, and more. Understand strengths, limitations, and when to use each design.',
-    icon: BookOpen,
-    path: '/study-designs',
-    color: 'text-blue-500',
-    level: 'Beginner',
-  },
-  {
-    id: 'bias-lab',
-    title: 'Bias Visualization Lab',
-    description:
-      'Interactive visualizations showing how selection bias, information bias, and confounding distort study results.',
-    icon: Microscope,
-    path: '/bias-lab',
-    color: 'text-purple-500',
-    level: 'Intermediate',
-  },
-  {
-    id: 'dag-builder',
-    title: 'Causal DAG Builder',
-    description:
-      'Build directed acyclic graphs to represent causal relationships. Identify confounders, colliders, and mediators.',
-    icon: Network,
-    path: '/dag-builder',
-    color: 'text-green-500',
-    level: 'Advanced',
-  },
-  {
-    id: 'confounding-lab',
-    title: 'Confounding & Effect Modification',
-    description:
-      'Explore the difference between confounding and effect modification through interactive examples and stratification.',
-    icon: FlaskConical,
-    path: '/confounding-lab',
-    color: 'text-orange-500',
-    level: 'Intermediate',
-  },
-  {
-    id: 'study-sandbox',
-    title: 'Study Design Sandbox',
-    description:
-      'Design your own studies, manipulate variables, and see how design choices affect validity and bias.',
-    icon: GraduationCap,
-    path: '/study-sandbox',
-    color: 'text-red-500',
-    level: 'Advanced',
-  },
-  {
-    id: 'glossary',
-    title: 'Glossary',
-    description:
-      'Comprehensive definitions of epidemiologic terms with examples and related concepts.',
-    icon: BookMarked,
-    path: '/glossary',
-    color: 'text-indigo-500',
-    level: 'All Levels',
-  },
-  {
-    id: 'ethics',
-    title: 'Research Ethics',
-    description:
-      'Explore ethical considerations in study design, including equipoise, informed consent, and research integrity.',
-    icon: Scale,
-    path: '/ethics',
-    color: 'text-teal-500',
-    level: 'All Levels',
-  },
-  {
-    id: 'assessments',
-    title: 'Assessment Hub',
-    description:
-      'Test your knowledge with quizzes covering study design, bias, confounding, and causal inference.',
-    icon: GraduationCap,
-    path: '/assessments',
-    color: 'text-pink-500',
-    level: 'All Levels',
-  },
+const labs = [
+  { to: '/dag-builder', title: 'DAG Lab', text: 'Draw causal diagrams; see every path, which are open, and the minimal adjustment sets.', icon: Network },
+  { to: '/confounding-lab', title: 'Confounding & EM Lab', text: 'Build confounding from its parts, watch Simpson\'s paradox appear, and test interaction on both scales.', icon: FlaskConical },
+  { to: '/bias-lab', title: 'Bias Lab', text: 'Berkson\'s bias, loss to follow-up, misclassification, immortal time and lead time — with the numbers.', icon: Microscope },
+  { to: '/study-sandbox', title: 'Study Simulator', text: 'Run 100 studies at once to separate random error from bias; plan sample size.', icon: Sigma },
+  { to: '/calculators', title: 'Calculators', text: '2×2 measures with proper CIs, OR vs RR, E-values and power — with the arithmetic shown.', icon: Calculator },
 ];
 
-export function Home() {
+export default function Home() {
+  const completed = useProgressStore((s) => s.completed);
+  const answers = useProgressStore((s) => s.answers);
+  const mastery = useMastery();
+  const next = modules.find((m) => !completed.includes(m.id)) ?? modules[0];
+  const answered = Object.keys(answers).length;
+  const correct = Object.values(answers).filter((a) => a.correct).length;
+  const started = answered > 0 || completed.length > 0;
+
   return (
-    <div className="space-y-8">
-      {/* Hero Section */}
-      <div className="space-y-4">
-        <h1 className="text-4xl font-bold tracking-tight">
-          Welcome to EpiWorlds
-        </h1>
-        <p className="text-xl text-muted-foreground max-w-3xl">
-          A comprehensive, interactive learning environment for mastering
-          epidemiology—from study design to causal inference. Built for
-          clinicians, researchers, and public health professionals.
-        </p>
-      </div>
+    <div className="space-y-12">
+      <PageHeader eyebrow="Clinical epidemiology & causal inference" title="Learn to judge whether X really causes Y">
+        Eleven sequenced modules take you from a 2×2 table to target trial emulation. Every concept comes with a simulation you can break, worked numbers, and questions that check you can apply it.
+      </PageHeader>
 
-      {/* Key Features */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Why EpiWorlds?</CardTitle>
-          <CardDescription>
-            Clinical epidemiology made intuitive through interactive learning
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-4 md:grid-cols-3">
-            <div className="space-y-2">
-              <h3 className="font-semibold">Interactive Learning</h3>
-              <p className="text-sm text-muted-foreground">
-                Build DAGs, visualize bias, and design studies in real-time
-                sandboxes.
-              </p>
-            </div>
-            <div className="space-y-2">
-              <h3 className="font-semibold">Clinically Rigorous</h3>
-              <p className="text-sm text-muted-foreground">
-                Evidence-based content aligned with STROBE, CONSORT, and modern
-                causal inference frameworks.
-              </p>
-            </div>
-            <div className="space-y-2">
-              <h3 className="font-semibold">Offline-Ready</h3>
-              <p className="text-sm text-muted-foreground">
-                Access all content offline. Dark mode optimized for late-night
-                study sessions.
-              </p>
-            </div>
+      <section className="grid gap-4 md:grid-cols-[1.4fr_1fr]">
+        <div className="rounded-xl border bg-card p-5 sm:p-6">
+          <p className="text-sm font-medium text-muted-foreground">{started ? 'Continue' : 'Start here'}</p>
+          <p className="mt-1 text-xl font-semibold">
+            Module {next.n}: {next.title}
+          </p>
+          <p className="mt-2 text-sm leading-6 text-muted-foreground">{next.outcome}</p>
+          <div className="mt-4 flex flex-wrap gap-3">
+            <Link to={`/learn/${next.id}`} className={buttonClasses('default', 'md')}>
+              {started ? 'Continue' : 'Begin module 1'} <ArrowRight className="h-4 w-4" />
+            </Link>
+            <Link to="/learn" className={buttonClasses('outline', 'md')}>
+              Course map
+            </Link>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <div className="rounded-xl border bg-card p-4">
+            <p className="text-xs font-medium text-muted-foreground">Modules completed</p>
+            <p className="tabular mt-1 text-3xl font-semibold">{completed.length}<span className="text-base text-muted-foreground">/{modules.length}</span></p>
+          </div>
+          <div className="rounded-xl border bg-card p-4">
+            <p className="text-xs font-medium text-muted-foreground">Questions right</p>
+            <p className="tabular mt-1 text-3xl font-semibold">{correct}<span className="text-base text-muted-foreground">/{questions.length}</span></p>
+          </div>
+          <Link to="/assessments" className="col-span-2 flex items-center justify-between rounded-xl border bg-card p-4 hover:border-primary">
+            <span>
+              <span className="block text-sm font-semibold">Practice & exams</span>
+              <span className="text-xs text-muted-foreground">{questions.length} questions with rationales{answered ? ` · ${answered} attempted` : ''}</span>
+            </span>
+            <GraduationCap className="h-6 w-6 text-primary" />
+          </Link>
+        </div>
+      </section>
 
-      {/* Learning Modules */}
-      <div>
-        <h2 className="text-2xl font-bold mb-4">Learning Modules</h2>
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {modules.map((module) => {
-            const Icon = module.icon;
+      <section>
+        <h2 className="mb-1 text-xl font-semibold">The course</h2>
+        <p className="mb-4 text-sm text-muted-foreground">Each module: concise lesson → interactive → checkpoint questions → takeaways and pitfalls → sources.</p>
+        <ol className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {modules.map((m) => {
+            const ms = mastery[m.id];
+            const done = completed.includes(m.id);
             return (
-              <Card key={module.id} className="flex flex-col">
-                <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <Icon className={`h-8 w-8 ${module.color}`} />
-                    <Badge variant="outline">{module.level}</Badge>
+              <li key={m.id}>
+                <Link to={`/learn/${m.id}`} className="group flex h-full flex-col rounded-lg border bg-card p-4 transition-colors hover:border-primary">
+                  <div className="flex items-center justify-between">
+                    <span className={cn('flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold', done ? 'bg-good/15 text-good' : 'bg-muted text-muted-foreground')}>
+                      {done ? <CheckCircle2 className="h-4 w-4" aria-label="completed" /> : m.n}
+                    </span>
+                    <span className="text-xs text-muted-foreground">{m.minutes} min</span>
                   </div>
-                  <CardTitle className="text-xl">{module.title}</CardTitle>
-                  <CardDescription>{module.description}</CardDescription>
-                </CardHeader>
-                <CardContent className="mt-auto">
-                  <Link to={module.path}>
-                    <Button className="w-full" variant="outline">
-                      Explore Module
-                      <ArrowRight className="ml-2 h-4 w-4" />
-                    </Button>
-                  </Link>
-                </CardContent>
-              </Card>
+                  <p className="mt-3 font-semibold leading-snug group-hover:text-primary">{m.title}</p>
+                  <p className="mt-1 flex-1 text-sm leading-6 text-muted-foreground">{m.outcome}</p>
+                  <div className="mt-3">
+                    <div className="h-1.5 overflow-hidden rounded-full bg-muted" role="progressbar" aria-valuemin={0} aria-valuemax={ms.total} aria-valuenow={ms.correct} aria-label={`${m.title} mastery`}>
+                      <div className="h-full rounded-full bg-primary" style={{ width: `${(ms.correct / Math.max(1, ms.total)) * 100}%` }} />
+                    </div>
+                    <p className="mt-1 text-[11px] text-muted-foreground">{ms.correct}/{ms.total} checkpoint questions correct</p>
+                  </div>
+                </Link>
+              </li>
             );
           })}
-        </div>
-      </div>
+        </ol>
+      </section>
 
-      {/* Learning Path Suggestion */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Suggested Learning Path</CardTitle>
-          <CardDescription>
-            New to epidemiology? Follow this sequence
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <ol className="space-y-2">
-            <li className="flex items-center gap-2">
-              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-medium">
-                1
-              </span>
-              <span>Start with <strong>Glossary</strong> to build foundational vocabulary</span>
-            </li>
-            <li className="flex items-center gap-2">
-              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-medium">
-                2
-              </span>
-              <span>Explore <strong>Study Design Explorer</strong> to understand different study types</span>
-            </li>
-            <li className="flex items-center gap-2">
-              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-medium">
-                3
-              </span>
-              <span>Master <strong>Bias Visualization Lab</strong> to recognize sources of error</span>
-            </li>
-            <li className="flex items-center gap-2">
-              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-medium">
-                4
-              </span>
-              <span>Learn <strong>Confounding & Effect Modification</strong> concepts</span>
-            </li>
-            <li className="flex items-center gap-2">
-              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-medium">
-                5
-              </span>
-              <span>Build causal intuition with <strong>DAG Builder</strong></span>
-            </li>
-            <li className="flex items-center gap-2">
-              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-medium">
-                6
-              </span>
-              <span>Practice in the <strong>Study Sandbox</strong> and test knowledge with <strong>Assessments</strong></span>
-            </li>
-          </ol>
-        </CardContent>
-      </Card>
+      <section>
+        <h2 className="mb-4 text-xl font-semibold">Labs</h2>
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {labs.map(({ to, title, text, icon: Icon }) => (
+            <Link key={to} to={to} className="group rounded-lg border bg-card p-4 transition-colors hover:border-primary">
+              <Icon className="h-6 w-6 text-primary" aria-hidden />
+              <p className="mt-3 font-semibold group-hover:text-primary">{title}</p>
+              <p className="mt-1 text-sm leading-6 text-muted-foreground">{text}</p>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      <section className="rounded-xl border bg-card p-5 sm:p-6">
+        <h2 className="text-lg font-semibold">Built on current evidence</h2>
+        <p className="mt-2 text-sm leading-6 text-muted-foreground">
+          Methods follow Modern Epidemiology (4th ed.) and Hernán & Robins' <em>Causal Inference: What If</em>. Standards are current to late 2026: CONSORT 2025, SPIRIT 2025, TARGET 2025, ROBINS-I V2, the 2024 Declaration of Helsinki and ICH E6(R3). Every calculation is unit-tested against published worked examples, and every source links to its DOI.
+        </p>
+        <Link to="/reference" className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline">
+          Formulas & sources <ArrowRight className="h-4 w-4" />
+        </Link>
+      </section>
     </div>
   );
 }

@@ -1,220 +1,98 @@
 import { useState } from 'react';
-import { studyDesigns } from '../data/studyDesigns';
-import type { StudyDesign } from '../types';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/Card';
+import { Link } from 'react-router-dom';
+import { PageHeader } from '../components/PageHeader';
+import { DesignChooser } from '../components/interactives/DesignChooser';
 import { Badge } from '../components/ui/Badge';
-import { Button } from '../components/ui/Button';
-import { CheckCircle, XCircle, Lightbulb, BookOpen } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card';
+import { designs } from '../data/designs';
+import { cn } from '../lib/utils';
 
-export function StudyDesigns() {
-  const [selectedDesign, setSelectedDesign] = useState<StudyDesign | null>(
-    studyDesigns[0]
-  );
-
+export default function StudyDesigns() {
+  const [open, setOpen] = useState<string>(designs[0].id);
+  const d = designs.find((x) => x.id === open)!;
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">Study Design Explorer</h1>
-        <p className="text-muted-foreground mt-2">
-          Compare different epidemiologic study designs and understand their
-          strengths and limitations.
-        </p>
-      </div>
+    <div className="space-y-10">
+      <PageHeader eyebrow="Reference" title="Study designs">
+        What each design samples, what it can estimate, where it fails, and which guideline it is reported with. Theory is in <Link to="/learn/study-designs" className="text-primary underline underline-offset-2">Module 2</Link>.
+      </PageHeader>
 
-      <div className="grid gap-6 lg:grid-cols-3">
-        {/* Study Design List */}
-        <div className="lg:col-span-1">
-          <Card>
+      <Card>
+        <CardHeader><CardTitle>Which design fits my question?</CardTitle></CardHeader>
+        <CardContent><DesignChooser /></CardContent>
+      </Card>
+
+      <section>
+        <h2 className="mb-4 text-xl font-semibold">Design catalogue</h2>
+        <div className="grid gap-4 lg:grid-cols-[16rem_1fr]">
+          <div className="flex gap-2 overflow-x-auto pb-2 lg:flex-col lg:overflow-visible lg:pb-0" role="tablist" aria-label="Designs">
+            {designs.map((x) => (
+              <button
+                key={x.id}
+                type="button"
+                role="tab"
+                aria-selected={open === x.id}
+                onClick={() => setOpen(x.id)}
+                className={cn('shrink-0 rounded-md border px-3 py-2 text-left text-sm transition-colors', open === x.id ? 'border-primary bg-accent font-medium' : 'hover:bg-accent/50')}
+              >
+                {x.name}
+              </button>
+            ))}
+          </div>
+          <Card role="tabpanel">
             <CardHeader>
-              <CardTitle>Study Types</CardTitle>
-              <CardDescription>Select a study design to explore</CardDescription>
+              <div className="flex flex-wrap items-center gap-2">
+                <CardTitle className="text-xl">{d.name}</CardTitle>
+                <Badge variant="secondary">{d.family}</Badge>
+              </div>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                {studyDesigns.map((design) => (
-                  <Button
-                    key={design.id}
-                    variant={
-                      selectedDesign?.id === design.id ? 'default' : 'outline'
-                    }
-                    className="w-full justify-start"
-                    onClick={() => setSelectedDesign(design)}
-                  >
-                    {design.name}
-                  </Button>
-                ))}
+            <CardContent className="space-y-4 text-sm leading-6">
+              <dl className="grid gap-3 sm:grid-cols-[9rem_1fr]">
+                <dt className="font-semibold">Sampling</dt><dd>{d.sampling}</dd>
+                <dt className="font-semibold">Estimates</dt><dd>{d.estimates}</dd>
+                <dt className="font-semibold">Best for</dt><dd>{d.bestFor}</dd>
+                <dt className="font-semibold">Report with</dt><dd>{d.guideline}</dd>
+                <dt className="font-semibold">Example</dt><dd>{d.example}</dd>
+              </dl>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <p className="mb-1 font-semibold text-good">Strengths</p>
+                  <ul className="list-disc space-y-1 pl-5">{d.strengths.map((s) => <li key={s}>{s}</li>)}</ul>
+                </div>
+                <div>
+                  <p className="mb-1 font-semibold text-bad">Main threats</p>
+                  <ul className="list-disc space-y-1 pl-5">{d.threats.map((s) => <li key={s}>{s}</li>)}</ul>
+                </div>
               </div>
             </CardContent>
           </Card>
         </div>
+      </section>
 
-        {/* Study Design Details */}
-        {selectedDesign && (
-          <div className="lg:col-span-2 space-y-6">
-            {/* Overview */}
-            <Card>
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div>
-                    <CardTitle className="text-2xl">
-                      {selectedDesign.name}
-                    </CardTitle>
-                    <Badge className="mt-2" variant="secondary">
-                      {selectedDesign.type.toUpperCase()}
-                    </Badge>
-                  </div>
-                  <BookOpen className="h-8 w-8 text-muted-foreground" />
-                </div>
-                <CardDescription className="text-base mt-4">
-                  {selectedDesign.description}
-                </CardDescription>
-              </CardHeader>
-            </Card>
-
-            {/* Strengths */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <CheckCircle className="h-5 w-5 text-green-500" />
-                  Strengths
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-2">
-                  {selectedDesign.strengths.map((strength, index) => (
-                    <li key={index} className="flex items-start gap-2">
-                      <span className="text-green-500 mt-0.5">✓</span>
-                      <span>{strength}</span>
-                    </li>
-                  ))}
-                </ul>
-              </CardContent>
-            </Card>
-
-            {/* Limitations */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <XCircle className="h-5 w-5 text-red-500" />
-                  Limitations
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-2">
-                  {selectedDesign.limitations.map((limitation, index) => (
-                    <li key={index} className="flex items-start gap-2">
-                      <span className="text-red-500 mt-0.5">✗</span>
-                      <span>{limitation}</span>
-                    </li>
-                  ))}
-                </ul>
-              </CardContent>
-            </Card>
-
-            {/* Examples */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Lightbulb className="h-5 w-5 text-yellow-500" />
-                  Real-World Examples
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-2">
-                  {selectedDesign.examples.map((example, index) => (
-                    <li key={index} className="flex items-start gap-2">
-                      <span className="text-yellow-500 mt-0.5">•</span>
-                      <span>{example}</span>
-                    </li>
-                  ))}
-                </ul>
-              </CardContent>
-            </Card>
-
-            {/* Prerequisites */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Prerequisites to Understand This Design</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex flex-wrap gap-2">
-                  {selectedDesign.prerequisites.map((prereq, index) => (
-                    <Badge key={index} variant="outline">
-                      {prereq}
-                    </Badge>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        )}
-      </div>
-
-      {/* Comparison Table */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Quick Comparison</CardTitle>
-          <CardDescription>
-            At-a-glance comparison of all study designs
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b">
-                  <th className="text-left p-2 font-semibold">Study Design</th>
-                  <th className="text-left p-2 font-semibold">Type</th>
-                  <th className="text-left p-2 font-semibold">Best For</th>
-                  <th className="text-left p-2 font-semibold">Causal Inference</th>
+      <section>
+        <h2 className="mb-4 text-xl font-semibold">At a glance</h2>
+        <div className="overflow-x-auto rounded-lg border">
+          <table className="w-full min-w-[44rem] text-sm">
+            <thead className="bg-muted/50">
+              <tr>
+                <th className="px-3 py-2 text-left font-semibold">Design</th>
+                <th className="px-3 py-2 text-left font-semibold">Estimates</th>
+                <th className="px-3 py-2 text-left font-semibold">Biggest threat</th>
+                <th className="px-3 py-2 text-left font-semibold">Guideline</th>
+              </tr>
+            </thead>
+            <tbody>
+              {designs.map((x) => (
+                <tr key={x.id} className="border-t align-top">
+                  <td className="px-3 py-2 font-medium">{x.name}</td>
+                  <td className="px-3 py-2">{x.estimates.split(';')[0]}</td>
+                  <td className="px-3 py-2">{x.threats[0]}</td>
+                  <td className="px-3 py-2 text-muted-foreground">{x.guideline}</td>
                 </tr>
-              </thead>
-              <tbody>
-                <tr className="border-b">
-                  <td className="p-2">RCT</td>
-                  <td className="p-2">Experimental</td>
-                  <td className="p-2">Testing interventions</td>
-                  <td className="p-2">
-                    <Badge variant="default">Strongest</Badge>
-                  </td>
-                </tr>
-                <tr className="border-b">
-                  <td className="p-2">Cohort</td>
-                  <td className="p-2">Observational</td>
-                  <td className="p-2">Rare exposures, incidence</td>
-                  <td className="p-2">
-                    <Badge variant="secondary">Strong</Badge>
-                  </td>
-                </tr>
-                <tr className="border-b">
-                  <td className="p-2">Case-Control</td>
-                  <td className="p-2">Observational</td>
-                  <td className="p-2">Rare outcomes, quick results</td>
-                  <td className="p-2">
-                    <Badge variant="secondary">Moderate</Badge>
-                  </td>
-                </tr>
-                <tr className="border-b">
-                  <td className="p-2">Cross-Sectional</td>
-                  <td className="p-2">Observational</td>
-                  <td className="p-2">Prevalence, hypothesis generation</td>
-                  <td className="p-2">
-                    <Badge variant="outline">Weak</Badge>
-                  </td>
-                </tr>
-                <tr>
-                  <td className="p-2">Ecologic</td>
-                  <td className="p-2">Observational</td>
-                  <td className="p-2">Population-level associations</td>
-                  <td className="p-2">
-                    <Badge variant="outline">Weakest</Badge>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </CardContent>
-      </Card>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
     </div>
   );
 }

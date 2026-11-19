@@ -1,252 +1,119 @@
-import type { GlossaryTerm } from '../types';
+import type { ModuleId } from './curriculum';
 
-export const glossaryTerms: GlossaryTerm[] = [
-  {
-    id: 'exposure',
-    term: 'Exposure',
-    definition:
-      'A factor, characteristic, or condition that is hypothesized to influence the occurrence of a health outcome. Can be protective or harmful.',
-    synonyms: ['Risk factor', 'Predictor', 'Independent variable'],
-    relatedTerms: ['outcome', 'confounder', 'effect-modification'],
-    examples: [
-      'Smoking (exposure) and lung cancer (outcome)',
-      'Physical activity (exposure) and cardiovascular disease (outcome)',
-    ],
-    category: 'Study Design',
-  },
-  {
-    id: 'outcome',
-    term: 'Outcome',
-    definition:
-      'The health event or condition of interest that is being studied; the dependent variable in epidemiologic research.',
-    synonyms: ['Endpoint', 'Dependent variable', 'Disease'],
-    relatedTerms: ['exposure', 'incidence', 'prevalence'],
-    examples: ['Myocardial infarction', 'Death', 'Hospital readmission'],
-    category: 'Study Design',
-  },
-  {
-    id: 'confounder',
-    term: 'Confounder',
-    definition:
-      'A variable that is associated with both the exposure and the outcome, but is not in the causal pathway between them, potentially distorting the true relationship.',
-    synonyms: ['Confounding variable', 'Third variable'],
-    relatedTerms: ['dag', 'backdoor-path', 'adjustment'],
-    examples: [
-      'Age confounding the relationship between coffee consumption and heart disease',
-      'Socioeconomic status confounding education and health outcomes',
-    ],
-    category: 'Bias & Confounding',
-  },
-  {
-    id: 'effect-modification',
-    term: 'Effect Modification',
-    definition:
-      'When the magnitude of the effect of an exposure on an outcome differs across levels of a third variable (the effect modifier). Also called interaction.',
-    synonyms: ['Interaction', 'Effect measure modification'],
-    relatedTerms: ['stratification', 'heterogeneity'],
-    examples: [
-      'Aspirin prevents MI more effectively in men than women',
-      'The effect of smoking on lung cancer differs by asbestos exposure',
-    ],
-    category: 'Bias & Confounding',
-  },
-  {
-    id: 'dag',
-    term: 'Directed Acyclic Graph (DAG)',
-    definition:
-      'A visual representation of assumed causal relationships between variables, where arrows indicate causal direction and acyclic means no variable can cause itself.',
-    synonyms: ['Causal diagram', 'Causal graph'],
-    relatedTerms: ['collider', 'mediator', 'backdoor-path', 'confounder'],
-    examples: ['DAG showing exposure → outcome with confounders'],
-    category: 'Causal Inference',
-  },
-  {
-    id: 'collider',
-    term: 'Collider',
-    definition:
-      'A variable that is causally influenced by two or more other variables in a DAG. Conditioning on a collider opens a non-causal path and introduces bias.',
-    synonyms: ['Collision node'],
-    relatedTerms: ['dag', 'collider-bias', 'backdoor-path'],
-    examples: [
-      'Selecting only hospitalized patients (hospital admission is a collider)',
-      'Adjusting for a disease that is caused by both exposure and outcome',
-    ],
-    category: 'Causal Inference',
-  },
-  {
-    id: 'mediator',
-    term: 'Mediator',
-    definition:
-      'A variable that lies in the causal pathway between exposure and outcome, transmitting the effect of the exposure.',
-    synonyms: ['Intermediate variable'],
-    relatedTerms: ['dag', 'indirect-effect', 'causal-pathway'],
-    examples: [
-      'Smoking → lung inflammation → cancer',
-      'Exercise → weight loss → improved glucose control',
-    ],
-    category: 'Causal Inference',
-  },
-  {
-    id: 'backdoor-path',
-    term: 'Backdoor Path',
-    definition:
-      'A non-causal path between exposure and outcome that begins with an arrow into the exposure. These paths must be blocked to obtain an unbiased causal effect.',
-    synonyms: ['Non-causal path', 'Confounding path'],
-    relatedTerms: ['dag', 'confounder', 'adjustment'],
-    examples: ['Exposure ← Confounder → Outcome'],
-    category: 'Causal Inference',
-  },
-  {
-    id: 'incidence',
-    term: 'Incidence',
-    definition:
-      'The number of new cases of a disease or condition occurring in a defined population during a specified time period.',
-    synonyms: ['Incidence rate', 'Attack rate'],
-    relatedTerms: ['prevalence', 'risk', 'cohort-study'],
-    examples: ['50 new cases of diabetes per 100,000 person-years'],
-    category: 'Measures',
-  },
-  {
-    id: 'prevalence',
-    term: 'Prevalence',
-    definition:
-      'The proportion of a population that has a disease or condition at a specific point in time (point prevalence) or during a period (period prevalence).',
-    synonyms: ['Prevalence proportion'],
-    relatedTerms: ['incidence', 'cross-sectional', 'odds'],
-    examples: ['15% of adults have hypertension'],
-    category: 'Measures',
-  },
-  {
-    id: 'risk-ratio',
-    term: 'Risk Ratio',
-    definition:
-      'The ratio of the risk (probability) of an outcome in the exposed group to the risk in the unexposed group. Also called relative risk.',
-    synonyms: ['Relative risk', 'RR'],
-    relatedTerms: ['incidence', 'cohort-study', 'attributable-risk'],
-    examples: [
-      'RR = 2.5 means the exposed group has 2.5 times the risk',
-      'RR = 1.0 means no association',
-      'RR < 1.0 means protective effect',
-    ],
-    category: 'Measures',
-  },
-  {
-    id: 'odds-ratio',
-    term: 'Odds Ratio',
-    definition:
-      'The ratio of the odds of an outcome in the exposed group to the odds in the unexposed group. The primary measure of association in case-control studies.',
-    synonyms: ['OR'],
-    relatedTerms: ['case-control', 'logistic-regression', 'prevalence'],
-    examples: [
-      'OR = 3.0 means the odds of exposure are 3 times higher in cases',
-      'OR approximates RR when outcome is rare',
-    ],
-    category: 'Measures',
-  },
-  {
-    id: 'internal-validity',
-    term: 'Internal Validity',
-    definition:
-      'The degree to which a study properly measures the relationship it intends to measure, free from systematic bias.',
-    synonyms: ['Study validity'],
-    relatedTerms: ['external-validity', 'bias', 'confounding'],
-    examples: [
-      'Randomization enhances internal validity',
-      'Selection bias threatens internal validity',
-    ],
-    category: 'Validity',
-  },
-  {
-    id: 'external-validity',
-    term: 'External Validity',
-    definition:
-      'The degree to which study results can be generalized to other populations, settings, or time periods.',
-    synonyms: ['Generalizability', 'Applicability'],
-    relatedTerms: ['internal-validity', 'population', 'sampling'],
-    examples: [
-      'RCT results may have limited external validity if inclusion criteria are strict',
-      'Community-based studies often have better external validity',
-    ],
-    category: 'Validity',
-  },
-  {
-    id: 'randomization',
-    term: 'Randomization',
-    definition:
-      'The process of randomly allocating participants to treatment or control groups to ensure groups are comparable at baseline and to control for confounding.',
-    synonyms: ['Random allocation'],
-    relatedTerms: ['rct', 'confounding', 'internal-validity'],
-    examples: [
-      'Simple randomization using random number table',
-      'Block randomization to ensure balance',
-      'Stratified randomization by important prognostic factors',
-    ],
-    category: 'Study Design',
-  },
-  {
-    id: 'blinding',
-    term: 'Blinding',
-    definition:
-      'Keeping study participants, investigators, or outcome assessors unaware of treatment allocation to reduce bias.',
-    synonyms: ['Masking'],
-    relatedTerms: ['rct', 'placebo', 'bias'],
-    examples: [
-      'Single-blind: participants unaware of treatment',
-      'Double-blind: participants and investigators unaware',
-      'Triple-blind: participants, investigators, and analysts unaware',
-    ],
-    category: 'Study Design',
-  },
-  {
-    id: 'equipoise',
-    term: 'Equipoise',
-    definition:
-      'Genuine uncertainty within the expert medical community about the relative therapeutic merits of intervention options, ethically justifying randomization.',
-    synonyms: ['Clinical equipoise', 'Uncertainty principle'],
-    relatedTerms: ['ethics', 'rct', 'informed-consent'],
-    examples: [
-      'Equipoise exists when there is no clear evidence favoring one treatment',
-      'Loss of equipoise may require stopping a trial early',
-    ],
-    category: 'Ethics',
-  },
-  {
-    id: 'counterfactual',
-    term: 'Counterfactual',
-    definition:
-      'What would have happened to the same individual under an alternative exposure scenario; the fundamental concept underlying causal inference.',
-    synonyms: ['Potential outcome'],
-    relatedTerms: ['causal-effect', 'exchangeability', 'dag'],
-    examples: [
-      'What would have happened to treated patients if they had not been treated?',
-      'The outcome an individual would have experienced under different exposure',
-    ],
-    category: 'Causal Inference',
-  },
-  {
-    id: 'exchangeability',
-    term: 'Exchangeability',
-    definition:
-      'The assumption that exposed and unexposed groups would have the same outcome distribution if they had the same exposure; essential for causal inference.',
-    synonyms: ['Comparability', 'No unmeasured confounding'],
-    relatedTerms: ['confounding', 'randomization', 'causal-effect'],
-    examples: [
-      'Randomization creates exchangeability',
-      'Violated by unmeasured confounding',
-    ],
-    category: 'Causal Inference',
-  },
-  {
-    id: 'stratification',
-    term: 'Stratification',
-    definition:
-      'Dividing the study population into subgroups (strata) based on a third variable to examine or control for its effects.',
-    synonyms: ['Subgroup analysis'],
-    relatedTerms: ['effect-modification', 'confounding', 'adjustment'],
-    examples: [
-      'Stratifying by age groups to examine effect modification',
-      'Mantel-Haenszel stratified analysis',
-    ],
-    category: 'Analysis',
-  },
+export interface GlossaryTerm {
+  term: string;
+  definition: string;
+  formula?: string;
+  aka?: string[];
+  example?: string;
+  related?: string[];
+  module: ModuleId;
+}
+
+export const glossary: GlossaryTerm[] = [
+  // Measures
+  { term: 'Prevalence', module: 'measures', definition: 'Proportion of a population that has a condition at a point in time (point prevalence) or during a period (period prevalence). Depends on both incidence and duration.', formula: 'existing cases / population', example: '15% of adults have hypertension today.', related: ['Incidence rate', 'Cross-sectional study'] },
+  { term: 'Risk', module: 'measures', aka: ['Cumulative incidence', 'Incidence proportion', 'Attack rate (outbreaks)'], definition: 'Probability that a person free of the outcome develops it during a specified period. Meaningless without the time window.', formula: 'new cases / population at risk at start', example: '10-year risk of MI = 8%.', related: ['Incidence rate', 'Risk ratio'] },
+  { term: 'Incidence rate', module: 'measures', aka: ['Incidence density', 'Hazard (instantaneous)'], definition: 'Number of new cases per unit of person-time at risk. Units are 1/time; handles variable follow-up.', formula: 'new cases / person-time at risk', example: '5 strokes per 1,000 person-years.', related: ['Risk', 'Rate ratio', 'Hazard ratio'] },
+  { term: 'Odds', module: 'measures', definition: 'Probability of an event divided by the probability of no event.', formula: 'p / (1 − p)', example: 'Risk 0.20 → odds 0.25.', related: ['Odds ratio'] },
+  { term: 'Risk ratio', module: 'measures', aka: ['Relative risk', 'RR', 'Cumulative incidence ratio'], definition: 'Risk in the exposed divided by risk in the unexposed over the same period. 1 = no association.', formula: 'RR = [a/(a+b)] / [c/(c+d)]; 95% CI = exp(ln RR ± 1.96·√(1/a − 1/(a+b) + 1/c − 1/(c+d)))', related: ['Risk difference', 'Odds ratio'] },
+  { term: 'Rate ratio', module: 'measures', aka: ['Incidence rate ratio', 'IRR'], definition: 'Incidence rate in the exposed divided by the rate in the unexposed.', related: ['Incidence rate', 'Hazard ratio'] },
+  { term: 'Hazard ratio', module: 'measures', aka: ['HR'], definition: 'Ratio of instantaneous event rates among those still at risk, usually from a Cox model. A single HR is a weighted average if hazards are not proportional and is not a ratio of cumulative risks.', related: ['Incidence rate', 'Non-collapsibility'] },
+  { term: 'Risk difference', module: 'measures', aka: ['Absolute risk reduction/increase', 'Attributable risk (in the exposed)'], definition: 'Risk in the exposed minus risk in the unexposed: the absolute excess (or deficit) of cases attributable to exposure, if causal.', formula: 'RD = a/(a+b) − c/(c+d)', related: ['Number needed to treat'] },
+  { term: 'Odds ratio', module: 'measures', aka: ['OR'], definition: 'Ratio of odds of the outcome in exposed vs unexposed — equal to the ratio of exposure odds in cases vs non-cases. Approximates the RR only when the outcome is rare; in case–control studies with risk-set sampling it estimates the rate ratio.', formula: 'OR = ad / bc; 95% CI = exp(ln OR ± 1.96·√(1/a + 1/b + 1/c + 1/d))', related: ['Risk ratio', 'Case–control study', 'Non-collapsibility'] },
+  { term: 'Number needed to treat', module: 'measures', aka: ['NNT', 'NNTB', 'NNTH'], definition: 'Number of patients who must receive the intervention, over a stated period, for one additional patient to benefit (NNTB) or be harmed (NNTH). If the RD CI includes zero, report "NNTB x to ∞ to NNTH y".', formula: 'NNT = 1 / |RD|', related: ['Risk difference'] },
+  { term: 'Population attributable fraction', module: 'measures', aka: ['PAF'], definition: 'Proportion of cases in a population that would not occur if the exposure were removed, assuming causality and no other change.', formula: 'PAF = p_c (RR − 1) / RR, where p_c = proportion of cases exposed (valid with confounding when RR is adjusted)', related: ['Risk difference'] },
+
+  // Designs
+  { term: 'Randomised controlled trial', module: 'study-designs', aka: ['RCT'], definition: 'Experiment in which chance determines treatment assignment, making groups exchangeable on average for measured and unmeasured factors.', related: ['Allocation concealment', 'Blinding', 'Intention-to-treat'] },
+  { term: 'Allocation concealment', module: 'study-designs', definition: 'Keeping the upcoming assignment hidden from those enrolling participants until the moment of assignment. Prevents selection bias at entry; always feasible.', related: ['Randomised controlled trial', 'Blinding'] },
+  { term: 'Blinding', module: 'study-designs', aka: ['Masking'], definition: 'Keeping participants, clinicians, outcome assessors and/or analysts unaware of allocation after assignment. Prevents performance and detection bias. Report who was blinded rather than "single/double-blind".', related: ['Allocation concealment', 'Detection bias'] },
+  { term: 'Intention-to-treat', module: 'study-designs', aka: ['ITT'], definition: 'Analysing participants in the groups to which they were randomised, regardless of adherence. Estimates the effect of assignment; preserves randomisation. Does not by itself handle missing outcomes.', related: ['Per-protocol effect'] },
+  { term: 'Per-protocol effect', module: 'study-designs', definition: 'Effect of receiving the treatment strategies as specified in the protocol. Estimating it validly usually requires adjusting for post-randomisation confounders (e.g. inverse probability weighting), not simply excluding non-adherers.', related: ['Intention-to-treat'] },
+  { term: 'Cohort study', module: 'study-designs', definition: 'Participants are classified by exposure and followed for outcomes; risks and rates can be estimated directly. Can be prospective or retrospective (historical).', related: ['Case–control study', 'Immortal time bias'] },
+  { term: 'Case–control study', module: 'study-designs', definition: 'Participants are sampled by outcome status (cases and controls from the same source population) and exposure history is compared. Estimates the OR; with risk-set sampling the OR estimates the rate ratio.', related: ['Nested case–control study', 'Odds ratio', 'Recall bias'] },
+  { term: 'Nested case–control study', module: 'study-designs', definition: 'Case–control study within a defined cohort, with controls sampled from those at risk when each case occurs (risk-set sampling). Efficient when exposure measurement is expensive (e.g. stored samples).', related: ['Case–cohort study'] },
+  { term: 'Case–cohort study', module: 'study-designs', definition: 'All cases plus a random subcohort sampled at baseline regardless of later outcome. The subcohort can serve several outcomes; estimates risk or rate ratios with appropriate analysis.', related: ['Nested case–control study'] },
+  { term: 'Case-crossover design', module: 'study-designs', definition: 'Only cases: exposure just before the event (hazard window) is compared with exposure in earlier control windows in the same person. For transient exposures with acute effects; controls time-invariant confounding.', related: ['Self-controlled case series'] },
+  { term: 'Self-controlled case series', module: 'study-designs', aka: ['SCCS'], definition: 'Only cases: incidence in risk windows after exposure is compared with other observed time in the same individuals. Controls fixed confounders; requires that events do not alter subsequent exposure or censor observation (or that this is handled).', related: ['Case-crossover design'] },
+  { term: 'Cross-sectional study', module: 'study-designs', definition: 'Exposure and outcome measured at the same time in a sample of a population. Estimates prevalence and prevalence ratios/odds; temporality is usually unclear.', related: ['Prevalence'] },
+  { term: 'Ecologic study', module: 'study-designs', definition: 'Units of analysis are groups (countries, regions, time periods), not individuals. Useful for contextual and policy exposures; vulnerable to the ecological fallacy and group-level confounding.', related: ['Ecological fallacy'] },
+  { term: 'Ecological fallacy', module: 'study-designs', definition: 'Inferring individual-level relationships from group-level associations (Robinson 1950).', related: ['Ecologic study'] },
+  { term: 'Target trial emulation', module: 'study-designs', definition: 'Designing an observational analysis by first specifying the protocol of the randomised trial one would like to run (eligibility, strategies, assignment, time zero, follow-up, outcome, contrast, analysis) and then emulating each element. Report with TARGET (2025).', related: ['Immortal time bias', 'New-user design'] },
+  { term: 'New-user design', module: 'clinical-biases', aka: ['Incident-user design'], definition: 'Restricting to patients starting a treatment (ideally versus starting an active comparator), with covariates measured before initiation. Avoids prevalent-user bias and adjustment for treatment-affected covariates.', related: ['Target trial emulation', 'Confounding by indication'] },
+
+  // Random error
+  { term: 'Confidence interval', module: 'random-error', definition: 'An interval from a procedure that, over hypothetical repetitions with all assumptions met, contains the true parameter a stated proportion (e.g. 95%) of the time. Shows the range of effect sizes reasonably compatible with the data.', related: ['P value', 'Precision'] },
+  { term: 'P value', module: 'random-error', definition: 'Probability, computed assuming the test hypothesis and all model assumptions are correct, of a test statistic at least as extreme as observed. Not the probability that the hypothesis is true, and not a measure of effect size or importance.', related: ['Confidence interval', 'Statistical power'] },
+  { term: 'Statistical power', module: 'random-error', definition: 'Probability that a study rejects the null hypothesis when a specified true effect exists. Depends on effect size, baseline risk/variance, sample size, α, and allocation ratio.', formula: 'n per group = [z₁₋α/₂√(2p̄q̄) + z₁₋β√(p₁q₁ + p₀q₀)]² / (p₁ − p₀)²', related: ['P value'] },
+  { term: 'Precision', module: 'random-error', definition: 'Lack of random error; reflected in narrow confidence intervals. Distinct from validity (lack of systematic error).', related: ['Validity'] },
+  { term: 'Validity', module: 'random-error', aka: ['Internal validity'], definition: 'Absence of systematic error (confounding, selection bias, information bias) in estimating the effect in the study population. External validity (transportability) concerns other populations.', related: ['Precision', 'Transportability'] },
+
+  // Causal inference
+  { term: 'Potential outcome', module: 'causal-dags', aka: ['Counterfactual outcome'], definition: 'The outcome a person would have under a specified treatment value, Y^a. Only one potential outcome per person is observed; causal effects compare their distributions in a population.', related: ['Exchangeability', 'Consistency'] },
+  { term: 'Exchangeability', module: 'causal-dags', aka: ['No unmeasured confounding', 'Ignorability'], definition: 'The treated and untreated would have the same distribution of potential outcomes; conditional exchangeability holds this within levels of measured covariates L.', related: ['Confounding', 'Randomised controlled trial'] },
+  { term: 'Positivity', module: 'causal-dags', aka: ['Overlap'], definition: 'Every combination of confounders has a non-zero probability of each treatment level being studied.', related: ['Exchangeability'] },
+  { term: 'Consistency', module: 'causal-dags', definition: 'The observed outcome of a person who received treatment a equals their potential outcome Y^a — requires sufficiently well-defined interventions.', related: ['Potential outcome'] },
+  { term: 'Directed acyclic graph', module: 'causal-dags', aka: ['DAG', 'Causal diagram'], definition: 'Graph of variables (nodes) connected by single-headed arrows representing direct causal effects, with no directed cycles. Missing arrows encode the key assumptions.', related: ['d-separation', 'Backdoor criterion'] },
+  { term: 'd-separation', module: 'causal-dags', definition: 'A path is blocked by a set Z if it contains a non-collider in Z, or a collider with neither itself nor any descendant in Z. If all paths between X and Y are blocked, X and Y are independent given Z in every distribution the DAG allows.', related: ['Collider', 'Backdoor criterion'] },
+  { term: 'Backdoor path', module: 'causal-dags', definition: 'A path between exposure and outcome that starts with an arrow into the exposure (X ← …). Open backdoor paths transmit non-causal association: confounding.', related: ['Confounding', 'Backdoor criterion'] },
+  { term: 'Backdoor criterion', module: 'causal-dags', definition: 'A set Z is sufficient for confounding control if no member of Z is a descendant of X and Z blocks every backdoor path from X to Y (Pearl).', related: ['Minimal sufficient adjustment set'] },
+  { term: 'Minimal sufficient adjustment set', module: 'causal-dags', definition: 'An adjustment set satisfying the backdoor criterion from which no variable can be removed without losing sufficiency. A DAG may have several.', related: ['Backdoor criterion'] },
+  { term: 'Collider', module: 'causal-dags', definition: 'A variable on a path where two arrowheads meet (→ C ←). A collider blocks the path unless it, or a descendant, is conditioned on. Collider status is specific to a path, not a property of the variable.', related: ['Selection bias', 'M-bias'] },
+  { term: 'Mediator', module: 'causal-dags', aka: ['Intermediate variable'], definition: 'A variable on a causal path from exposure to outcome (X → M → Y). Adjusting for it blocks part of the total effect and may induce collider bias with unmeasured causes of M and Y.', related: ['Directed acyclic graph'] },
+  { term: 'M-bias', module: 'causal-dags', definition: 'Bias from adjusting for a pre-exposure collider whose parents separately cause exposure and outcome (X ← U1 → M ← U2 → Y). Shows that "pre-exposure and associated with both" is not sufficient to be a confounder.', related: ['Collider'] },
+  { term: 'Table 2 fallacy', module: 'causal-dags', definition: 'Interpreting every coefficient of a model built for one exposure as a causal effect; each effect requires its own adjustment set (Westreich & Greenland 2013).', related: ['Minimal sufficient adjustment set'] },
+  { term: 'Instrumental variable', module: 'causal-dags', definition: 'A variable that affects the exposure, affects the outcome only through the exposure, and shares no causes with the outcome. Can address unmeasured confounding under additional assumptions (e.g. monotonicity); Mendelian randomisation uses genetic variants.', related: ['Confounding'] },
+
+  // Confounding
+  { term: 'Confounding', module: 'confounding', definition: 'Bias from a common cause of exposure and outcome — structurally, an open backdoor path. A confounder is a variable that can be used to block it.', related: ['Backdoor path', 'Confounding by indication', 'Residual confounding'] },
+  { term: "Simpson's paradox", module: 'confounding', definition: 'An association that reverses (or vanishes) when data are stratified by a third variable. Which estimate to believe depends on the causal structure, not on the arithmetic.', related: ['Confounding'] },
+  { term: 'Mantel–Haenszel estimator', module: 'confounding', definition: 'Weighted average of stratum-specific RRs or ORs that is robust with sparse strata. Appropriate when the effect is roughly homogeneous across strata.', formula: 'RR_MH = Σ(a·n₀/N) / Σ(c·n₁/N); OR_MH = Σ(ad/N) / Σ(bc/N)', related: ['Stratification'] },
+  { term: 'Stratification', module: 'confounding', definition: 'Analysing the exposure–outcome association separately within levels of another variable. Used to control confounding and to describe effect modification.', related: ['Mantel–Haenszel estimator', 'Effect modification'] },
+  { term: 'Propensity score', module: 'confounding', definition: 'Probability of treatment given measured covariates. Matching, weighting or stratifying on it balances those covariates; it does nothing for unmeasured confounders.', related: ['Inverse probability weighting'] },
+  { term: 'Inverse probability weighting', module: 'confounding', aka: ['IPW', 'IPTW'], definition: 'Weighting each person by the inverse of the probability of the treatment they received (or of remaining uncensored), creating a pseudo-population without measured confounding (or selection). A g-method that handles time-varying confounding.', related: ['Propensity score'] },
+  { term: 'Residual confounding', module: 'confounding', definition: 'Confounding that remains after adjustment because a confounder was coarsely categorised, mismeasured or incompletely modelled.', related: ['Confounding'] },
+  { term: 'Non-collapsibility', module: 'confounding', definition: 'Property of the OR and HR whereby the conditional (covariate-adjusted) and marginal measures differ even without confounding. RR and RD are collapsible.', related: ['Odds ratio', 'Hazard ratio'] },
+  { term: 'Confounding by indication', module: 'clinical-biases', definition: 'Confounding because the reason for treatment (disease severity, prognosis) also affects the outcome. Reduced by active-comparator new-user designs.', related: ['New-user design', 'Confounding'] },
+
+  // Selection
+  { term: 'Selection bias', module: 'selection-bias', definition: 'Bias from conditioning on a common effect of exposure and outcome (or of their causes) — e.g. differential participation, loss to follow-up, or restricting to a collider (Hernán et al. 2004).', related: ['Collider', "Berkson's bias", 'Loss to follow-up'] },
+  { term: "Berkson's bias", module: 'selection-bias', definition: 'Spurious association between two conditions in a hospital (or other selected) sample because both independently increase the chance of being selected.', related: ['Selection bias', 'Collider'] },
+  { term: 'Loss to follow-up', module: 'selection-bias', definition: 'Participants whose outcome is unknown at the end of study. Biases estimates when loss depends on both exposure and outcome risk (or their causes). Handled with inverse probability of censoring weights or imputation under stated assumptions.', related: ['Selection bias'] },
+  { term: 'Healthy worker effect', module: 'selection-bias', definition: 'Lower morbidity or mortality of workers compared with the general population because health is required to obtain and keep employment.', related: ['Selection bias'] },
+  { term: 'Transportability', module: 'selection-bias', aka: ['Generalisability', 'External validity'], definition: 'Whether an effect estimated in one population applies to another; depends on the distribution of effect modifiers in each.', related: ['Validity'] },
+
+  // Information
+  { term: 'Misclassification', module: 'information-bias', definition: 'Error in classifying a categorical variable. Non-differential: error rates do not depend on the other variable (e.g. exposure error independent of outcome). Differential: they do.', related: ['Sensitivity', 'Recall bias'] },
+  { term: 'Sensitivity', module: 'information-bias', definition: 'Proportion of truly positive people classified positive.', formula: 'Se = TP / (TP + FN)', related: ['Specificity'] },
+  { term: 'Specificity', module: 'information-bias', definition: 'Proportion of truly negative people classified negative.', formula: 'Sp = TN / (TN + FP)', related: ['Sensitivity'] },
+  { term: 'Recall bias', module: 'information-bias', definition: 'Differential misclassification of exposure because cases and controls remember or report past exposures differently.', related: ['Misclassification'] },
+  { term: 'Detection bias', module: 'information-bias', aka: ['Ascertainment bias', 'Surveillance bias'], definition: 'Outcomes are sought or diagnosed more intensively in one group, e.g. exposed patients monitored more closely.', related: ['Blinding'] },
+  { term: 'Quantitative bias analysis', module: 'information-bias', aka: ['QBA'], definition: 'Methods that estimate the direction and magnitude of systematic error using bias parameters (e.g. Se/Sp, selection probabilities, confounder prevalence).', related: ['E-value'] },
+
+  // Effect modification
+  { term: 'Effect modification', module: 'effect-modification', aka: ['Effect-measure modification', 'Heterogeneity of effect'], definition: 'The effect of an exposure differs across levels of another variable. Scale-dependent: present on the additive scale, the multiplicative scale, or both.', related: ['Interaction', 'RERI'] },
+  { term: 'Interaction', module: 'effect-modification', definition: 'The joint effect of two exposures differs from the combination of their separate effects (on a stated scale). Strictly a property of two interventions, whereas effect modification concerns one.', related: ['Effect modification', 'RERI'] },
+  { term: 'RERI', module: 'effect-modification', aka: ['Relative excess risk due to interaction'], definition: 'Additive interaction measured from relative risks; > 0 means the joint effect exceeds the sum of separate effects.', formula: 'RERI = RR₁₁ − RR₁₀ − RR₀₁ + 1', related: ['Interaction'] },
+
+  // Clinical biases
+  { term: 'Immortal time bias', module: 'clinical-biases', definition: 'Follow-up time during which the outcome could not occur in the exposed group by design (e.g. before the first prescription) is misattributed to exposure. Typically makes treatment look protective.', related: ['Target trial emulation'] },
+  { term: 'Protopathic bias', module: 'clinical-biases', definition: 'An exposure is started because of early, undiagnosed manifestations of the outcome (reverse causation). Mitigated by lagging exposure.', related: ['Confounding by indication'] },
+  { term: 'Lead-time bias', module: 'clinical-biases', definition: 'Apparent survival gain from earlier diagnosis without a change in time of death.', related: ['Length-time bias', 'Overdiagnosis'] },
+  { term: 'Length-time bias', module: 'clinical-biases', definition: 'Screening preferentially detects slow-growing disease with longer preclinical phases, making screen-detected cases look more favourable.', related: ['Lead-time bias', 'Overdiagnosis'] },
+  { term: 'Overdiagnosis', module: 'clinical-biases', definition: 'Diagnosis of disease that would never have caused symptoms or death during the person\'s lifetime.', related: ['Length-time bias'] },
+  { term: 'Regression to the mean', module: 'clinical-biases', definition: 'Tendency of extreme measurements to be followed by values closer to the mean because of random variation. Mimics treatment effects in uncontrolled before–after studies.', related: ['Randomised controlled trial'] },
+
+  // Appraisal
+  { term: 'E-value', module: 'appraisal', definition: 'Minimum strength of association (risk-ratio scale) an unmeasured confounder would need with both exposure and outcome, beyond measured covariates, to fully explain away an estimate.', formula: 'E = RR + √(RR × (RR − 1)), using 1/RR if RR < 1', related: ['Quantitative bias analysis'] },
+  { term: 'Bradford Hill considerations', module: 'appraisal', definition: 'Strength, consistency, specificity, temporality, biological gradient, plausibility, coherence, experiment, analogy (Hill 1965). Aids to judgement; only temporality is necessary.', related: ['Triangulation'] },
+  { term: 'Triangulation', module: 'appraisal', definition: 'Integrating results from approaches with different, unrelated sources of bias; agreement strengthens causal inference (Lawlor et al. 2016).', related: ['Bradford Hill considerations'] },
+  { term: 'GRADE', module: 'appraisal', definition: 'System rating certainty of a body of evidence (high, moderate, low, very low) by risk of bias, inconsistency, indirectness, imprecision and publication bias, with upgrading criteria for observational evidence.', related: ['Risk of bias'] },
+  { term: 'Risk of bias', module: 'appraisal', definition: 'Likelihood that features of a study\'s design or conduct give misleading results. Assessed with RoB 2 for randomised trials and ROBINS-I (V2) for non-randomised studies of interventions.', related: ['GRADE'] },
+  { term: 'Publication bias', module: 'appraisal', aka: ['Small-study effects', 'Reporting bias'], definition: 'Selective publication or reporting depending on results. Detected imperfectly by funnel-plot asymmetry; prevented by prospective registration and full reporting.', related: ['GRADE'] },
+
+  // Ethics
+  { term: 'Clinical equipoise', module: 'ethics', definition: 'Honest professional disagreement in the expert clinical community about the preferred treatment; the ethical basis for randomisation (Freedman 1987).', related: ['Informed consent'] },
+  { term: 'Informed consent', module: 'ethics', definition: 'Voluntary agreement by a competent person after disclosure and understanding of purpose, procedures, risks, benefits and alternatives. Waivers require specific regulatory criteria.', related: ['Clinical equipoise'] },
+  { term: 'Data monitoring committee', module: 'ethics', aka: ['DSMB', 'DMC'], definition: 'Independent group reviewing accumulating trial data for safety and efficacy against pre-specified stopping boundaries.', related: ['Clinical equipoise'] },
 ];
